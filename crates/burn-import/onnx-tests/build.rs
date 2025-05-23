@@ -83,6 +83,7 @@ fn main() {
         .input("tests/mean/mean.onnx")
         .input("tests/mul/mul.onnx")
         .input("tests/neg/neg.onnx")
+        .input("tests/non_zero/non_zero.onnx")
         .input("tests/not/not.onnx")
         .input("tests/one_hot/one_hot.onnx")
         .input("tests/or/or.onnx")

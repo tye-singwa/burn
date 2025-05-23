@@ -13,58 +13,9 @@ use log::warn;
 
 use crate::{
     burn::{
-        ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type,
-        graph::BurnGraph,
-        node::{
-            argmax::ArgMaxNode,
-            avg_pool1d::AvgPool1dNode,
-            avg_pool2d::AvgPool2dNode,
-            batch_norm::BatchNormNode,
-            binary::BinaryNode,
-            clip::ClipNode,
-            concat::ConcatNode,
-            constant::{ConstantNode, ConstantValue},
-            constant_of_shape::ConstantOfShapeNode,
-            conv_transpose_1d::ConvTranspose1dNode,
-            conv_transpose_2d::ConvTranspose2dNode,
-            conv_transpose_3d::ConvTranspose3dNode,
-            conv1d::Conv1dNode,
-            conv2d::Conv2dNode,
-            conv3d::Conv3dNode,
-            dropout::DropoutNode,
-            expand::ExpandNode,
-            floor::FloorNode,
-            gather::GatherNode,
-            gather_elements::GatherElementsNode,
-            gemm::GemmNode,
-            global_avg_pool::GlobalAvgPoolNode,
-            instance_norm::InstanceNormNode,
-            layer_norm::LayerNormNode,
-            linear::LinearNode,
-            mask_where::WhereNode,
-            matmul::MatmulNode,
-            max_pool1d::MaxPool1dNode,
-            max_pool2d::MaxPool2dNode,
-            one_hot::OneHotNode,
-            pad::PadNode,
-            prelu::PReluNode,
-            random_normal::RandomNormalNode,
-            random_normal_like::RandomNormalLikeNode,
-            random_uniform::RandomUniformNode,
-            random_uniform_like::RandomUniformLikeNode,
-            range::RangeNode,
-            reshape::ReshapeNode,
-            resize::ResizeNode,
-            slice::SliceNode,
-            split::SplitNode,
-            squeeze::SqueezeNode,
-            sum::SumNode,
-            tile::TileNode,
-            top_k::TopKNode,
-            trilu::TriluNode,
-            unary::UnaryNode,
-            unsqueeze::UnsqueezeNode,
-        },
+        graph::BurnGraph, node::{
+            argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode, batch_norm::BatchNormNode, binary::BinaryNode, clip::ClipNode, concat::ConcatNode, constant::{ConstantNode, ConstantValue}, constant_of_shape::ConstantOfShapeNode, conv1d::Conv1dNode, conv2d::Conv2dNode, conv3d::Conv3dNode, conv_transpose_1d::ConvTranspose1dNode, conv_transpose_2d::ConvTranspose2dNode, conv_transpose_3d::ConvTranspose3dNode, dropout::DropoutNode, expand::ExpandNode, floor::FloorNode, gather::GatherNode, gather_elements::GatherElementsNode, gemm::GemmNode, global_avg_pool::GlobalAvgPoolNode, instance_norm::InstanceNormNode, layer_norm::LayerNormNode, linear::LinearNode, mask_where::WhereNode, matmul::MatmulNode, max_pool1d::MaxPool1dNode, max_pool2d::MaxPool2dNode, non_zero::NonZeroNode, one_hot::OneHotNode, pad::PadNode, prelu::PReluNode, random_normal::RandomNormalNode, random_normal_like::RandomNormalLikeNode, random_uniform::RandomUniformNode, random_uniform_like::RandomUniformLikeNode, range::RangeNode, reshape::ReshapeNode, resize::ResizeNode, slice::SliceNode, split::SplitNode, squeeze::SqueezeNode, sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode, unsqueeze::UnsqueezeNode
+        }, ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type
     },
     format_tokens,
     logger::init_log,
@@ -307,6 +258,7 @@ impl ParsedOnnxGraph {
                 NodeType::AveragePool2d => graph.register(Self::avg_pool_2d_conversion(node)),
                 NodeType::MatMul => graph.register(Self::matmul_conversion(node)),
                 NodeType::Neg => graph.register(Self::neg_conversion(node)),
+                NodeType::NonZero => graph.register(Self::non_zero_conversion(node)),
                 NodeType::Not => graph.register(Self::not_conversion(node)),
                 NodeType::And => graph.register(Self::and_conversion(node)),
                 NodeType::Or => graph.register(Self::or_conversion(node)),
@@ -1409,6 +1361,13 @@ impl ParsedOnnxGraph {
 
         let (num_classes, values, axis) = one_hot_config(&node);
         OneHotNode::new(input, output, num_classes, values, values_type, axis)
+    }
+    
+    fn non_zero_conversion(node: Node) -> NonZeroNode {
+        let input = TensorType::from(node.inputs.first().unwrap());
+        let output = TensorType::from(node.outputs.first().unwrap());
+
+        NonZeroNode::new(input, output)
     }
 
     fn floor_conversion(node: Node) -> FloorNode {

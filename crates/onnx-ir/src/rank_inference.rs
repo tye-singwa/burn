@@ -70,6 +70,7 @@ pub fn rank_inference(node: &mut Node) {
         NodeType::Min => same_as_input_broadcast(node),
         NodeType::Mul => same_as_input(node),
         NodeType::Neg => same_as_input(node),
+        NodeType::NonZero => same_as_input(node),
         NodeType::Not => same_as_input(node),
         NodeType::And => same_as_input(node),
         NodeType::Or => same_as_input(node),
