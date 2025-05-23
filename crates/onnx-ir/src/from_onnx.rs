@@ -280,6 +280,10 @@ impl OnnxGraphBuilder {
             log::debug!("checking node {} for constants", &node.name);
             for input in node.inputs.iter_mut().skip(1) {
                 log::debug!("checking input {:?} for const", input);
+                if node.node_type == NodeType::Squeeze && input.name != "constant1_out1" {
+                    panic!("checked constants for node {}, {:?}", &node.name, self.constants_map);
+                }
+            
                 if let Some(const_idx) = self.constants_map.get(&input.name) {
                     let constant = &graph_data.processed_nodes[*const_idx];
                     log::debug!(

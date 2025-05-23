@@ -149,6 +149,7 @@ pub fn convert_node_proto(node: &NodeProto, graph_data: &GraphData) -> Node {
     let name = node.name.clone();
 
     log::debug!("Converting ONNX node with type {:?}", node.op_type.as_str());
+    log::debug!("Inputs: {:?}", node.input);
 
     let inputs = node.input.iter().map(|x| graph_data.init_in(x)).collect();
 

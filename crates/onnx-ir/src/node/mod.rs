@@ -36,6 +36,7 @@ pub mod layer_norm;
 pub mod leaky_relu;
 pub mod linear;
 pub mod log_softmax;
+pub mod lstm;
 pub mod matmul;
 pub mod max_pool1d;
 pub mod max_pool2d;

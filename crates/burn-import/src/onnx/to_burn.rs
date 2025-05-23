@@ -40,6 +40,7 @@ use crate::{
             global_avg_pool::GlobalAvgPoolNode,
             layer_norm::LayerNormNode,
             linear::LinearNode,
+            lstm::LstmNode,
             mask_where::WhereNode,
             matmul::MatmulNode,
             max_pool1d::MaxPool1dNode,
@@ -76,21 +77,7 @@ use onnx_ir::{
         TensorType as OnnxTensorType,
     },
     node::{
-        argmax::argmax_config, avg_pool1d::avg_pool1d_config, avg_pool2d::avg_pool2d_config,
-        batch_norm::batch_norm_config, clip::clip_config, concat::concat_config,
-        conv_transpose1d::conv_transpose1d_config, conv_transpose2d::conv_transpose2d_config,
-        conv_transpose3d::conv_transpose3d_config, conv1d::conv1d_config, conv2d::conv2d_config,
-        conv3d::conv3d_config, dropout::dropout_config, expand::expand_config,
-        flatten::flatten_config, gather::gather_config, gemm::gemm_config,
-        hard_sigmoid::hard_sigmoid_config, layer_norm::layer_norm_config,
-        leaky_relu::leaky_relu_config, linear::linear_config, log_softmax::log_softmax_config,
-        max_pool1d::max_pool1d_config, max_pool2d::max_pool2d_config, one_hot::one_hot_config,
-        pad::pad_config, reduce_max::reduce_max_config, reduce_mean::reduce_mean_config,
-        reduce_min::reduce_min_config, reduce_prod::reduce_prod_config,
-        reduce_sum::reduce_sum_config, reshape::reshape_config, resize::resize_config,
-        slice::slice_config, softmax::softmax_config, split::split_config, squeeze::squeeze_config,
-        tile::tile_config, topk::top_k_config, transpose::transpose_config, trilu::trilu_config,
-        unsqueeze::unsqueeze_config,
+        argmax::argmax_config, avg_pool1d::avg_pool1d_config, avg_pool2d::avg_pool2d_config, batch_norm::batch_norm_config, clip::clip_config, concat::concat_config, conv1d::conv1d_config, conv2d::conv2d_config, conv3d::conv3d_config, conv_transpose1d::conv_transpose1d_config, conv_transpose2d::conv_transpose2d_config, conv_transpose3d::conv_transpose3d_config, dropout::dropout_config, expand::expand_config, flatten::flatten_config, gather::gather_config, gemm::gemm_config, hard_sigmoid::hard_sigmoid_config, layer_norm::layer_norm_config, leaky_relu::leaky_relu_config, linear::linear_config, log_softmax::log_softmax_config, lstm::lstm_config, max_pool1d::max_pool1d_config, max_pool2d::max_pool2d_config, one_hot::one_hot_config, pad::pad_config, reduce_max::reduce_max_config, reduce_mean::reduce_mean_config, reduce_min::reduce_min_config, reduce_prod::reduce_prod_config, reduce_sum::reduce_sum_config, reshape::reshape_config, resize::resize_config, slice::slice_config, softmax::softmax_config, split::split_config, squeeze::squeeze_config, tile::tile_config, topk::top_k_config, transpose::transpose_config, trilu::trilu_config, unsqueeze::unsqueeze_config
     },
     parse_onnx,
     util::shape_config,
@@ -389,6 +376,7 @@ impl ParsedOnnxGraph {
                 }
                 NodeType::Split => graph.register(Self::split_conversion(node)),
                 NodeType::Gemm => graph.register(Self::gemm_conversion(node)),
+                NodeType::LSTM => graph.register(Self::lstm_conversion::<PS>(node)),
                 node_type => unsupported_ops.push(node_type),
             }
         }
@@ -1405,6 +1393,45 @@ impl ParsedOnnxGraph {
         let output = TensorType::from(node.outputs.first().unwrap());
         let (alpha, beta, trans_a, trans_b) = gemm_config(&node);
         GemmNode::new(a, b, c, output, alpha, beta, trans_a, trans_b)
+    }
+
+    fn lstm_conversion<PS: PrecisionSettings>(node: Node) -> LstmNode {
+        let input = TensorType::from(node.inputs.first().unwrap());
+        let initial_h = node.inputs.get(5).map(TensorType::from);
+        let initial_c = node.inputs.get(6).map(TensorType::from);
+
+        let (hidden_size, input_size) = lstm_config(&node);
+        
+        let output = TensorType::from(node.outputs.first().unwrap());
+        let output_hidden = node.outputs.get(1).map(TensorType::from);
+        let output_cell = node.outputs.get(2).map(TensorType::from);
+
+        let weight = extract_data_serialize::<PS::FloatElem>(1, &node).expect("Weight is required");
+        let r_weight: TensorData = extract_data_serialize::<PS::FloatElem>(2, &node)
+            .expect("Reccurence weight is required");
+        let bias = extract_data_serialize::<PS::FloatElem>(3, &node);
+
+        let sequence_lengths = extract_data_serialize::<
+            <FullPrecisionSettings as PrecisionSettings>::IntElem,
+        >(4, &node);
+        let pinholes = extract_data_serialize::<PS::FloatElem>(7, &node);
+
+        let name = &node.name;
+        LstmNode::new(
+            name,
+            input,
+            weight,
+            r_weight,
+            bias,
+            sequence_lengths,
+            initial_h,
+            initial_c,
+            output,
+            output_hidden,
+            output_cell,
+            input_size,
+            hidden_size,
+        )
     }
 }
 

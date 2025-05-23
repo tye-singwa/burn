@@ -67,6 +67,7 @@ fn main() {
         .input("tests/linear/linear.onnx")
         .input("tests/log/log.onnx")
         .input("tests/log_softmax/log_softmax.onnx")
+        .input("tests/lstm/lstm.onnx")
         .input("tests/mask_where/mask_where.onnx")
         .input("tests/mask_where/mask_where_broadcast.onnx")
         .input("tests/mask_where/mask_where_scalar_x.onnx")

@@ -1,19 +1,7 @@
 use crate::{
     ir::{Node, NodeType},
     node::{
-        argmax::argmax_update_outputs, cast::cast_update_outputs,
-        comparison::elementwise_comparison_outputs, concat::concat_update_outputs,
-        constant::constant_update_outputs, constant_of_shape::constant_of_shape_update_output,
-        expand::expand_update_outputs, flatten::flatten_update_outputs,
-        gather::gather_update_outputs, gemm::gemm_output_shape, linear::linear_update_outputs,
-        matmul::matmul_update_outputs, one_hot::one_hot_output_shape, random::random_update_output,
-        random_like::random_like_update_output, range::range_update_outputs,
-        reduce_max::reduce_max_update_outputs, reduce_mean::reduce_mean_update_outputs,
-        reduce_min::reduce_min_update_outputs, reduce_prod::reduce_prod_update_outputs,
-        reduce_sum::reduce_sum_update_outputs, reshape::reshape_update_outputs,
-        shape::shape_update_outputs, slice::slice_update_output_rank, split::split_update_outputs,
-        squeeze::squeeze_update_output, topk::top_k_update_output,
-        unsqueeze::unsqueeze_update_output, where_op::where_update_outputs,
+        argmax::argmax_update_outputs, cast::cast_update_outputs, comparison::elementwise_comparison_outputs, concat::concat_update_outputs, constant::constant_update_outputs, constant_of_shape::constant_of_shape_update_output, expand::expand_update_outputs, flatten::flatten_update_outputs, gather::gather_update_outputs, gemm::gemm_output_shape, linear::linear_update_outputs, lstm::lstm_update_outputs, matmul::matmul_update_outputs, one_hot::one_hot_output_shape, random::random_update_output, random_like::random_like_update_output, range::range_update_outputs, reduce_max::reduce_max_update_outputs, reduce_mean::reduce_mean_update_outputs, reduce_min::reduce_min_update_outputs, reduce_prod::reduce_prod_update_outputs, reduce_sum::reduce_sum_update_outputs, reshape::reshape_update_outputs, shape::shape_update_outputs, slice::slice_update_output_rank, split::split_update_outputs, squeeze::squeeze_update_output, topk::top_k_update_output, unsqueeze::unsqueeze_update_output, where_op::where_update_outputs
     },
     util::{same_as_input, same_as_input_broadcast, temporary_pass_through_stub},
 };
@@ -62,6 +50,7 @@ pub fn rank_inference(node: &mut Node) {
         NodeType::Linear => linear_update_outputs(node),
         NodeType::Log => same_as_input(node),
         NodeType::LogSoftmax => same_as_input(node),
+        NodeType::LSTM => lstm_update_outputs(node),
         NodeType::MatMul => matmul_update_outputs(node),
         NodeType::Max => same_as_input_broadcast(node),
         NodeType::MaxPool1d => same_as_input(node),
