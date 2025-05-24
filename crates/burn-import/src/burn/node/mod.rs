@@ -41,6 +41,7 @@ pub(crate) mod random_uniform_like;
 pub(crate) mod range;
 pub(crate) mod reshape;
 pub(crate) mod resize;
+pub(crate) mod round;
 pub(crate) mod slice;
 pub(crate) mod split;
 pub(crate) mod squeeze;

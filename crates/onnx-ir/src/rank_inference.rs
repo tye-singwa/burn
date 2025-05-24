@@ -93,6 +93,7 @@ pub fn rank_inference(node: &mut Node) {
         NodeType::Relu => same_as_input(node),
         NodeType::Reshape => reshape_update_outputs(node),
         NodeType::Resize => same_as_input(node),
+        NodeType::Round => same_as_input(node),
         NodeType::Shape => shape_update_outputs(node),
         NodeType::Sigmoid => same_as_input(node),
         NodeType::Sign => same_as_input(node),

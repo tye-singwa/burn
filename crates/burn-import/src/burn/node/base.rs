@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use super::{
-    argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode, batch_norm::BatchNormNode, binary::BinaryNode, ceil::CeilNode, clip::ClipNode, concat::ConcatNode, constant::ConstantNode, constant_of_shape::ConstantOfShapeNode, conv1d::Conv1dNode, conv2d::Conv2dNode, conv3d::Conv3dNode, conv_transpose_1d::ConvTranspose1dNode, conv_transpose_2d::ConvTranspose2dNode, conv_transpose_3d::ConvTranspose3dNode, dropout::DropoutNode, expand::ExpandNode, floor::FloorNode, gather::GatherNode, gather_elements::GatherElementsNode, gemm::GemmNode, global_avg_pool::GlobalAvgPoolNode, instance_norm::InstanceNormNode, layer_norm::LayerNormNode, linear::LinearNode, mask_where::WhereNode, matmul::MatmulNode, max_pool1d::MaxPool1dNode, max_pool2d::MaxPool2dNode, mean::MeanNode, one_hot::OneHotNode, pad::PadNode, prelu::PReluNode, random_normal::RandomNormalNode, random_normal_like::RandomNormalLikeNode, random_uniform::RandomUniformNode, random_uniform_like::RandomUniformLikeNode, range::RangeNode, reshape::ReshapeNode, resize::ResizeNode, slice::SliceNode, split::SplitNode, squeeze::SqueezeNode, sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode, unsqueeze::UnsqueezeNode
+    argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode, batch_norm::BatchNormNode, binary::BinaryNode, ceil::CeilNode, clip::ClipNode, concat::ConcatNode, constant::ConstantNode, constant_of_shape::ConstantOfShapeNode, conv1d::Conv1dNode, conv2d::Conv2dNode, conv3d::Conv3dNode, conv_transpose_1d::ConvTranspose1dNode, conv_transpose_2d::ConvTranspose2dNode, conv_transpose_3d::ConvTranspose3dNode, dropout::DropoutNode, expand::ExpandNode, floor::FloorNode, gather::GatherNode, gather_elements::GatherElementsNode, gemm::GemmNode, global_avg_pool::GlobalAvgPoolNode, instance_norm::InstanceNormNode, layer_norm::LayerNormNode, linear::LinearNode, mask_where::WhereNode, matmul::MatmulNode, max_pool1d::MaxPool1dNode, max_pool2d::MaxPool2dNode, mean::MeanNode, one_hot::OneHotNode, pad::PadNode, prelu::PReluNode, random_normal::RandomNormalNode, random_normal_like::RandomNormalLikeNode, random_uniform::RandomUniformNode, random_uniform_like::RandomUniformLikeNode, range::RangeNode, reshape::ReshapeNode, resize::ResizeNode, round::RoundNode, slice::SliceNode, split::SplitNode, squeeze::SqueezeNode, sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode, unsqueeze::UnsqueezeNode
 };
 use crate::burn::{BurnImports, Scope, Type};
 use burn::record::PrecisionSettings;
@@ -105,6 +105,7 @@ pub enum Node<PS: PrecisionSettings> {
     Range(RangeNode),
     Reshape(ReshapeNode),
     Resize(ResizeNode),
+    Round(RoundNode),
     Slice(SliceNode),
     Squeeze(SqueezeNode),
     Split(SplitNode),
@@ -164,6 +165,7 @@ macro_rules! match_all {
             Node::Range(node) => $func(node),
             Node::Reshape(node) => $func(node),
             Node::Resize(node) => $func(node),
+            Node::Round(node) => $func(node),
             Node::Slice(node) => $func(node),
             Node::Squeeze(node) => $func(node),
             Node::Sum(node) => $func(node),
@@ -231,6 +233,7 @@ impl<PS: PrecisionSettings> Node<PS> {
             Node::Range(_) => "range",
             Node::Reshape(_) => "reshape",
             Node::Resize(_) => "resize",
+            Node::Round(_) => "round",
             Node::Slice(_) => "slice",
             Node::Squeeze(_) => "squeeze",
             Node::Sum(_) => "add",

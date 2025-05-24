@@ -69,6 +69,7 @@ pub mod reduce_sum;
 pub mod relu;
 pub mod reshape;
 pub mod resize;
+pub mod round;
 pub mod shape;
 pub mod sigmoid;
 pub mod sign;
