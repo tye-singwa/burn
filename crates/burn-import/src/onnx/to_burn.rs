@@ -13,58 +13,9 @@ use log::warn;
 
 use crate::{
     burn::{
-        ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type,
-        graph::BurnGraph,
-        node::{
-            argmax::ArgMaxNode,
-            avg_pool1d::AvgPool1dNode,
-            avg_pool2d::AvgPool2dNode,
-            batch_norm::BatchNormNode,
-            binary::BinaryNode,
-            clip::ClipNode,
-            concat::ConcatNode,
-            constant::{ConstantNode, ConstantValue},
-            constant_of_shape::ConstantOfShapeNode,
-            conv_transpose_1d::ConvTranspose1dNode,
-            conv_transpose_2d::ConvTranspose2dNode,
-            conv_transpose_3d::ConvTranspose3dNode,
-            conv1d::Conv1dNode,
-            conv2d::Conv2dNode,
-            conv3d::Conv3dNode,
-            dropout::DropoutNode,
-            expand::ExpandNode,
-            floor::FloorNode,
-            gather::GatherNode,
-            gather_elements::GatherElementsNode,
-            gemm::GemmNode,
-            global_avg_pool::GlobalAvgPoolNode,
-            instance_norm::InstanceNormNode,
-            layer_norm::LayerNormNode,
-            linear::LinearNode,
-            mask_where::WhereNode,
-            matmul::MatmulNode,
-            max_pool1d::MaxPool1dNode,
-            max_pool2d::MaxPool2dNode,
-            one_hot::OneHotNode,
-            pad::PadNode,
-            prelu::PReluNode,
-            random_normal::RandomNormalNode,
-            random_normal_like::RandomNormalLikeNode,
-            random_uniform::RandomUniformNode,
-            random_uniform_like::RandomUniformLikeNode,
-            range::RangeNode,
-            reshape::ReshapeNode,
-            resize::ResizeNode,
-            slice::SliceNode,
-            split::SplitNode,
-            squeeze::SqueezeNode,
-            sum::SumNode,
-            tile::TileNode,
-            top_k::TopKNode,
-            trilu::TriluNode,
-            unary::UnaryNode,
-            unsqueeze::UnsqueezeNode,
-        },
+        graph::BurnGraph, node::{
+            argmax::ArgMaxNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode, batch_norm::BatchNormNode, binary::BinaryNode, ceil::CeilNode, clip::ClipNode, concat::ConcatNode, constant::{ConstantNode, ConstantValue}, constant_of_shape::ConstantOfShapeNode, conv1d::Conv1dNode, conv2d::Conv2dNode, conv3d::Conv3dNode, conv_transpose_1d::ConvTranspose1dNode, conv_transpose_2d::ConvTranspose2dNode, conv_transpose_3d::ConvTranspose3dNode, dropout::DropoutNode, expand::ExpandNode, floor::FloorNode, gather::GatherNode, gather_elements::GatherElementsNode, gemm::GemmNode, global_avg_pool::GlobalAvgPoolNode, instance_norm::InstanceNormNode, layer_norm::LayerNormNode, linear::LinearNode, mask_where::WhereNode, matmul::MatmulNode, max_pool1d::MaxPool1dNode, max_pool2d::MaxPool2dNode, one_hot::OneHotNode, pad::PadNode, prelu::PReluNode, random_normal::RandomNormalNode, random_normal_like::RandomNormalLikeNode, random_uniform::RandomUniformNode, random_uniform_like::RandomUniformLikeNode, range::RangeNode, reshape::ReshapeNode, resize::ResizeNode, slice::SliceNode, split::SplitNode, squeeze::SqueezeNode, sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode, unsqueeze::UnsqueezeNode
+        }, ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type
     },
     format_tokens,
     logger::init_log,
@@ -292,6 +243,7 @@ impl ParsedOnnxGraph {
                 NodeType::Exp => graph.register(Self::exp_conversion(node)),
                 NodeType::Expand => graph.register(Self::expand_conversion(node)),
                 NodeType::Floor => graph.register(Self::floor_conversion(node)),
+                NodeType::Ceil => graph.register(Self::ceil_conversion(node)),
                 NodeType::Clip => graph.register(Self::clip_conversion(node)),
                 NodeType::Cos => graph.register(Self::cos_conversion(node)),
                 NodeType::Cosh => graph.register(Self::cosh_conversion(node)),
@@ -1416,6 +1368,13 @@ impl ParsedOnnxGraph {
         let output = TensorType::from(node.outputs.first().unwrap());
 
         FloorNode::new(input, output)
+    }
+
+    fn ceil_conversion(node: Node) -> CeilNode {
+        let input = TensorType::from(node.inputs.first().unwrap());
+        let output = TensorType::from(node.outputs.first().unwrap());
+
+        CeilNode::new(input, output)
     }
 
     fn gemm_conversion(node: Node) -> GemmNode {

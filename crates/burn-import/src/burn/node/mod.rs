@@ -5,6 +5,7 @@ pub(crate) mod avg_pool1d;
 pub(crate) mod avg_pool2d;
 pub(crate) mod batch_norm;
 pub(crate) mod binary;
+pub(crate) mod ceil;
 pub(crate) mod clip;
 pub(crate) mod concat;
 pub(crate) mod constant;

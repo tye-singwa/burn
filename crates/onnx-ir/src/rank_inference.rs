@@ -29,6 +29,7 @@ pub fn rank_inference(node: &mut Node) {
         NodeType::AveragePool2d => same_as_input(node),
         NodeType::BatchNormalization => same_as_input(node),
         NodeType::Cast => cast_update_outputs(node),
+        NodeType::Ceil => same_as_input(node),
         NodeType::Clip => same_as_input(node),
         NodeType::Concat => concat_update_outputs(node),
         NodeType::Constant => constant_update_outputs(node),
