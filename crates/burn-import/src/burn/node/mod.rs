@@ -27,6 +27,7 @@ pub(crate) mod group_norm;
 pub(crate) mod instance_norm;
 pub(crate) mod layer_norm;
 pub(crate) mod linear;
+pub(crate) mod lstm;
 pub(crate) mod mask_where;
 pub(crate) mod matmul;
 pub(crate) mod max_pool1d;

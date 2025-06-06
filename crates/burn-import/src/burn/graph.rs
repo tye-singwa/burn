@@ -551,6 +551,7 @@ impl<PS: PrecisionSettings> BurnGraph<PS> {
         let mut inputs = HashMap::new();
         let mut outputs = HashMap::new();
         for node in self.nodes.iter() {
+            log::debug!("Node: {:?}, i: {:?}, o: {:?}", node, node.input_types(), node.output_types());
             for input in node.input_types() {
                 inputs.insert(input.name().to_string(), input);
             }
@@ -558,6 +559,9 @@ impl<PS: PrecisionSettings> BurnGraph<PS> {
                 outputs.insert(output.name().to_string(), output);
             }
         }
+        
+        log::debug!("Inputs: {:?}", inputs);
+        log::debug!("Input names: {:?}", input_names);
 
         // Get the input and output types of the graph using passed in names
         input_names.iter().for_each(|input| {

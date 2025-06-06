@@ -57,6 +57,10 @@ impl<B: Backend> GateController<B> {
     ///     H = hidden state
     ///     b = bias terms
     pub fn gate_product(&self, input: Tensor<B, 2>, hidden: Tensor<B, 2>) -> Tensor<B, 2> {
+        println!("GateProduct called with input shape: {:?}", input.shape());
+        println!("GateProduct called with hidden shape: {:?}", hidden.shape());
+        println!("input_transform: {:?}", self.input_transform);
+        println!("hidden_transform: {:?}", self.hidden_transform);
         self.input_transform.forward(input) + self.hidden_transform.forward(hidden)
     }
 

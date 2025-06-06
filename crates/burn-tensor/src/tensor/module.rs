@@ -1,9 +1,5 @@
 use crate::{
-    Int, Tensor, TensorPrimitive,
-    backend::Backend,
-    check,
-    check::TensorCheck,
-    ops::{ConvOptions, ConvTransposeOptions, InterpolateOptions, UnfoldOptions},
+    backend::Backend, check, check::TensorCheck, ops::{ConvOptions, ConvTransposeOptions, InterpolateOptions, UnfoldOptions}, Int, Tensor, TensorMetadata, TensorPrimitive
 };
 
 use super::ops::DeformConvOptions;
@@ -388,6 +384,9 @@ pub fn linear<B: Backend, const D: usize>(
     weight: Tensor<B, 2>,
     bias: Option<Tensor<B, 1>>,
 ) -> Tensor<B, D> {
+    println!("input.primitive.shape() = {:?}", input.primitive.shape());
+    println!("weight.primitive.shape() = {:?}", weight.primitive.shape());
+    println!("bias.primitive.shape() = {:?}", bias.as_ref().map(|b| b.primitive.shape()));
     Tensor::new(TensorPrimitive::Float(B::linear(
         input.primitive.tensor(),
         weight.primitive.tensor(),

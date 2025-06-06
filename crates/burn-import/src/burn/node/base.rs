@@ -18,7 +18,7 @@ use super::{
     sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode,
     unsqueeze::UnsqueezeNode,
 };
-use crate::burn::{BurnImports, Scope, Type};
+use crate::burn::{node::lstm::LstmNode, BurnImports, Scope, Type};
 use burn::record::PrecisionSettings;
 use proc_macro2::TokenStream;
 use serde::Serialize;
@@ -112,6 +112,7 @@ pub enum Node<PS: PrecisionSettings> {
     LayerNorm(LayerNormNode),
     GroupNorm(GroupNormNode),
     Linear(LinearNode),
+    Lstm(LstmNode),
     Matmul(MatmulNode),
     MaxPool1d(MaxPool1dNode),
     MaxPool2d(MaxPool2dNode),
@@ -173,6 +174,7 @@ macro_rules! match_all {
             Node::LayerNorm(node) => $func(node),
             Node::GroupNorm(node) => $func(node),
             Node::Linear(node) => $func(node),
+            Node::Lstm(node) => $func(node),
             Node::Matmul(node) => $func(node),
             Node::MaxPool1d(node) => $func(node),
             Node::MaxPool2d(node) => $func(node),
@@ -242,6 +244,7 @@ impl<PS: PrecisionSettings> Node<PS> {
             Node::LayerNorm(_) => "layer_norm",
             Node::GroupNorm(_) => "group_norm",
             Node::Linear(_) => "linear",
+            Node::Lstm(_) => "lstm",
             Node::Matmul(_) => "matmul",
             Node::MaxPool1d(_) => "max_pool1d",
             Node::MaxPool2d(_) => "max_pool2d",
