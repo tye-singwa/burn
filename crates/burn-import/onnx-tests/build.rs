@@ -34,6 +34,7 @@ fn main() {
         .input("tests/cosh/cosh.onnx")
         .input("tests/depth_to_space/depth_to_space_dcr.onnx")
         .input("tests/depth_to_space/depth_to_space_crd.onnx")
+        .input("tests/deform_conv/deform_conv2d.onnx")
         .input("tests/div/div.onnx")
         .input("tests/dropout/dropout.onnx")
         .input("tests/equal/equal.onnx")

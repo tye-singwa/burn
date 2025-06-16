@@ -325,6 +325,7 @@ pub enum NodeType {
     Cos,
     Cosh,
     CumSum,
+    DeformConv,
     DepthToSpace,
     DequantizeLinear,
     Det,

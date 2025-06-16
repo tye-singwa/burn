@@ -53,7 +53,7 @@ functionality.
 | [Cos][39]                        | ✅             | ✅           |
 | [Cosh][40]                       | ✅             | ✅           |
 | [CumSum][41]                     | ❌             | ❌           |
-| [DeformConv][196]                | ❌             | ❌           |
+| [DeformConv][196]                | ✅             | ✅           |
 | [DepthToSpace][42]               | ✅             | ✅           |
 | [DequantizeLinear][43]           | ❌             | ❌           |
 | [Det][44]                        | ❌             | ❌           |

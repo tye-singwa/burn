@@ -13,64 +13,9 @@ use log::warn;
 
 use crate::{
     burn::{
-        ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type,
-        graph::BurnGraph,
-        node::{
-            argmax::ArgMaxNode,
-            argmin::ArgMinNode,
-            avg_pool1d::AvgPool1dNode,
-            avg_pool2d::AvgPool2dNode,
-            batch_norm::BatchNormNode,
-            binary::BinaryNode,
-            ceil::CeilNode,
-            clip::ClipNode,
-            concat::ConcatNode,
-            constant::{ConstantNode, ConstantValue},
-            constant_of_shape::ConstantOfShapeNode,
-            conv_transpose_1d::ConvTranspose1dNode,
-            conv_transpose_2d::ConvTranspose2dNode,
-            conv_transpose_3d::ConvTranspose3dNode,
-            conv1d::Conv1dNode,
-            conv2d::Conv2dNode,
-            conv3d::Conv3dNode,
-            depth_to_space::DepthToSpaceNode,
-            dropout::DropoutNode,
-            expand::ExpandNode,
-            floor::FloorNode,
-            gather::GatherNode,
-            gather_elements::GatherElementsNode,
-            gemm::GemmNode,
-            global_avg_pool::GlobalAvgPoolNode,
-            group_norm::GroupNormNode,
-            instance_norm::InstanceNormNode,
-            layer_norm::LayerNormNode,
-            linear::LinearNode,
-            mask_where::WhereNode,
-            matmul::MatmulNode,
-            max_pool1d::MaxPool1dNode,
-            max_pool2d::MaxPool2dNode,
-            one_hot::OneHotNode,
-            pad::PadNode,
-            prelu::PReluNode,
-            random_normal::RandomNormalNode,
-            random_normal_like::RandomNormalLikeNode,
-            random_uniform::RandomUniformNode,
-            random_uniform_like::RandomUniformLikeNode,
-            range::RangeNode,
-            reshape::ReshapeNode,
-            resize::ResizeNode,
-            round::RoundNode,
-            slice::SliceNode,
-            space_to_depth::SpaceToDepthNode,
-            split::SplitNode,
-            squeeze::SqueezeNode,
-            sum::SumNode,
-            tile::TileNode,
-            top_k::TopKNode,
-            trilu::TriluNode,
-            unary::UnaryNode,
-            unsqueeze::UnsqueezeNode,
-        },
+        graph::BurnGraph, node::{
+            argmax::ArgMaxNode, argmin::ArgMinNode, avg_pool1d::AvgPool1dNode, avg_pool2d::AvgPool2dNode, batch_norm::BatchNormNode, binary::BinaryNode, ceil::CeilNode, clip::ClipNode, concat::ConcatNode, constant::{ConstantNode, ConstantValue}, constant_of_shape::ConstantOfShapeNode, conv1d::Conv1dNode, conv2d::Conv2dNode, conv3d::Conv3dNode, conv_transpose_1d::ConvTranspose1dNode, conv_transpose_2d::ConvTranspose2dNode, conv_transpose_3d::ConvTranspose3dNode, deform_conv::DeformConvNode, depth_to_space::DepthToSpaceNode, dropout::DropoutNode, expand::ExpandNode, floor::FloorNode, gather::GatherNode, gather_elements::GatherElementsNode, gemm::GemmNode, global_avg_pool::GlobalAvgPoolNode, group_norm::GroupNormNode, instance_norm::InstanceNormNode, layer_norm::LayerNormNode, linear::LinearNode, mask_where::WhereNode, matmul::MatmulNode, max_pool1d::MaxPool1dNode, max_pool2d::MaxPool2dNode, one_hot::OneHotNode, pad::PadNode, prelu::PReluNode, random_normal::RandomNormalNode, random_normal_like::RandomNormalLikeNode, random_uniform::RandomUniformNode, random_uniform_like::RandomUniformLikeNode, range::RangeNode, reshape::ReshapeNode, resize::ResizeNode, round::RoundNode, slice::SliceNode, space_to_depth::SpaceToDepthNode, split::SplitNode, squeeze::SqueezeNode, sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode, unsqueeze::UnsqueezeNode
+        }, ScalarKind, ScalarType, ShapeType, TensorKind, TensorType, Type
     },
     format_tokens,
     logger::init_log,
@@ -307,6 +252,7 @@ impl ParsedOnnxGraph {
                 NodeType::Conv1d => graph.register(Self::conv1d_conversion::<PS>(node)),
                 NodeType::Conv2d => graph.register(Self::conv2d_conversion::<PS>(node)),
                 NodeType::Conv3d => graph.register(Self::conv3d_conversion::<PS>(node)),
+                NodeType::DeformConv => graph.register(Self::deform_conv_conversion(node)),
                 NodeType::DepthToSpace => graph.register(Self::depth_to_space_conversion(node)),
                 NodeType::Max => graph.register(Self::max_conversion(node)),
                 NodeType::MaxPool1d => graph.register(Self::max_pool1d_conversion(node)),
@@ -1143,6 +1089,14 @@ impl ParsedOnnxGraph {
 
         let name = &node.name;
         Conv3dNode::new(name, input, output, weight, bias, config)
+    }
+    
+    fn deform_conv_conversion(node: Node) -> DeformConvNode {
+        let input = TensorType::from(node.inputs.first().unwrap());
+        let output = TensorType::from(node.outputs.first().unwrap());
+
+        let name = &node.name;
+        DeformConvNode::new(name, input, output)
     }
 
     fn depth_to_space_conversion(node: Node) -> DepthToSpaceNode {
