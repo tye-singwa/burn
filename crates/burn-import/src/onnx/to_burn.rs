@@ -44,6 +44,7 @@ use crate::{
             depth_to_space::DepthToSpaceNode,
             dropout::DropoutNode,
             expand::ExpandNode,
+            eye_like::EyeLikeNode,
             floor::FloorNode,
             gather::GatherNode,
             gather_elements::GatherElementsNode,
@@ -350,6 +351,7 @@ impl ParsedOnnxGraph {
                 NodeType::Erf => graph.register(Self::erf_conversion(node)),
                 NodeType::Exp => graph.register(Self::exp_conversion(node)),
                 NodeType::Expand => graph.register(Self::expand_conversion(node)),
+                NodeType::EyeLike => graph.register(Self::eye_like_conversion(node)),
                 NodeType::Floor => graph.register(Self::floor_conversion(node)),
                 NodeType::Ceil => graph.register(Self::ceil_conversion(node)),
                 NodeType::Clip => graph.register(Self::clip_conversion(node)),
@@ -1583,6 +1585,14 @@ impl ParsedOnnxGraph {
         let shape = expand_config(&node);
 
         ExpandNode::new(input, output, shape)
+    }
+
+    fn eye_like_conversion(node: Node) -> EyeLikeNode{
+        let input = TensorType::from(node.inputs.first().unwrap());
+        let output = TensorType::from(node.outputs.first().unwrap());
+        // let shape = eye_like_config(&node);
+
+        EyeLikeNode::new(input, output, 0)
     }
 
     fn neg_conversion(node: Node) -> UnaryNode {
