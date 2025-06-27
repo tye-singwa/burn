@@ -33,7 +33,7 @@ This will create a `.venv` directory with all the required dependencies.
 If you prefer to set up manually, you need to install the following packages:
 
 ```sh
-pip install onnx==1.15.0 torch==2.1.1
+pip install onnx==1.18.0 torch==2.3.1
 ```
 
 Additional dependencies are specified in `requirements.lock`.

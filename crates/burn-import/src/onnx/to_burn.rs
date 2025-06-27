@@ -18,6 +18,7 @@ use crate::{
         node::{
             argmax::ArgMaxNode,
             argmin::ArgMinNode,
+            attention::AttentionNode,
             avg_pool1d::AvgPool1dNode,
             avg_pool2d::AvgPool2dNode,
             batch_norm::BatchNormNode,
@@ -292,6 +293,7 @@ impl ParsedOnnxGraph {
                 NodeType::Add => graph.register(Self::add_conversion(node)),
                 NodeType::ArgMax => graph.register(Self::argmax_conversion(node)),
                 NodeType::ArgMin => graph.register(Self::argmin_conversion(node)),
+                NodeType::Attention => graph.register(Self::attention_conversion(node)),
                 NodeType::Sub => graph.register(Self::sub_conversion(node)),
                 NodeType::Mul => graph.register(Self::mul_conversion(node)),
                 NodeType::Div => graph.register(Self::div_conversion(node)),
@@ -1493,6 +1495,16 @@ impl ParsedOnnxGraph {
         let output = TensorType::from(node.outputs.first().unwrap());
         let (alpha, beta, trans_a, trans_b) = gemm_config(&node);
         GemmNode::new(a, b, c, output, alpha, beta, trans_a, trans_b)
+    }
+
+    fn attention_conversion(node: Node) -> AttentionNode {
+        let q = TensorType::from(node.inputs.first().unwrap());
+        let k = TensorType::from(node.inputs.get(1).unwrap());
+        let v = TensorType::from(node.inputs.get(2).unwrap());
+        let output = TensorType::from(node.outputs.first().unwrap());
+
+        let name = &node.name;
+        AttentionNode::new(name, q, k, v, output)
     }
 }
 

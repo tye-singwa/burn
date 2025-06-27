@@ -57,7 +57,7 @@ nvidia-nvjitlink-cu12==12.5.40
     # via nvidia-cusparse-cu12
 nvidia-nvtx-cu12==12.1.105
     # via torch
-onnx==1.16.1
+onnx==1.18.0
     # via onnx-tests
 onnxruntime==1.18.0
     # via onnx-tests
@@ -72,4 +72,5 @@ sympy==1.12.1
 torch==2.3.1
     # via onnx-tests
 typing-extensions==4.12.2
+    # via onnx
     # via torch

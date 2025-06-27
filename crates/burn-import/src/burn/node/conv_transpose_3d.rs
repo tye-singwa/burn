@@ -52,7 +52,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for ConvTranspose3dNode {
     }
     fn output_types(&self) -> Vec<Type> {
         vec![Type::Tensor(self.output.clone())]
-    }
+}
     fn field_type(&self) -> Option<Type> {
         Some(Type::Other(self.field.clone()))
     }
@@ -92,6 +92,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for ConvTranspose3dNode {
                     &device,
                 ),
             ),
+            
             bias: self.data_bias.as_ref().map(|bias| {
                 Param::initialized(
                     ParamId::new(),

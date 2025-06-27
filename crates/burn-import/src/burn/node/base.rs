@@ -18,7 +18,10 @@ use super::{
     sum::SumNode, tile::TileNode, top_k::TopKNode, trilu::TriluNode, unary::UnaryNode,
     unsqueeze::UnsqueezeNode,
 };
-use crate::burn::{BurnImports, Scope, Type, node::space_to_depth::SpaceToDepthNode};
+use crate::burn::{
+    BurnImports, Scope, Type,
+    node::{attention::AttentionNode, space_to_depth::SpaceToDepthNode},
+};
 use burn::record::PrecisionSettings;
 use proc_macro2::TokenStream;
 use serde::Serialize;
@@ -89,6 +92,7 @@ pub enum Node<PS: PrecisionSettings> {
     ArgMin(ArgMinNode),
     AvgPool1d(AvgPool1dNode),
     AvgPool2d(AvgPool2dNode),
+    Attention(AttentionNode),
     BatchNorm(BatchNormNode),
     Binary(BinaryNode),
     Clip(ClipNode),
@@ -153,6 +157,7 @@ macro_rules! match_all {
             Node::ArgMin(node) => $func(node),
             Node::AvgPool1d(node) => $func(node),
             Node::AvgPool2d(node) => $func(node),
+            Node::Attention(node) => $func(node),
             Node::BatchNorm(node) => $func(node),
             Node::Binary(node) => $func(node),
             Node::Clip(node) => $func(node),
@@ -225,6 +230,7 @@ impl<PS: PrecisionSettings> Node<PS> {
             Node::ArgMin(_) => "argmin",
             Node::AvgPool1d(_) => "avg_pool1d",
             Node::AvgPool2d(_) => "avg_pool2d",
+            Node::Attention(_) => "attention",
             Node::BatchNorm(_) => "batch_norm",
             Node::Binary(binary) => binary.binary_type.as_str(),
             Node::Concat(_) => "concat",
@@ -404,10 +410,9 @@ pub(crate) mod tests {
             ),
         ));
 
-        graph.register_input_output(
-            vec!["tensor1".to_string(), "tensor2".to_string()],
-            vec!["tensor4".to_string()],
-        );
+        graph.register_input_output(vec!["tensor1".to_string(), "tensor2".to_string()], vec![
+            "tensor4".to_string(),
+        ]);
 
         let expected = quote! {
             use burn::{
@@ -490,10 +495,9 @@ pub(crate) mod tests {
             TensorType::new_float("output", 4),
         ));
 
-        graph.register_input_output(
-            vec!["tensor1".to_string(), "tensor2".to_string()],
-            vec!["output".to_string()],
-        );
+        graph.register_input_output(vec!["tensor1".to_string(), "tensor2".to_string()], vec![
+            "output".to_string(),
+        ]);
 
         let expected = quote! {
             use burn::{
