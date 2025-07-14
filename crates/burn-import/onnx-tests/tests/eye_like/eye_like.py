@@ -67,16 +67,21 @@ if __name__ == "__main__":
     np.set_printoptions(precision=8)
 
     test_input = np.random.randn(2, 3).round(2)
-    export_onnx_model(
-        "eye_like_2d.onnx", test_input,
-        k=1,
-        dtype=TensorProto.FLOAT
-    )
-    print("\n\n")
 
-    test_input = np.random.randn(4).round(2)
+    # Test k>0
     export_onnx_model(
-        "eye_like_1d.onnx", test_input,
-        k=-2,
-        dtype=TensorProto.INT32
+        "eye_like_up.onnx", test_input,
+        k=1, dtype=TensorProto.FLOAT
+    )
+
+    # Test k<0
+    export_onnx_model(
+        "eye_like_down.onnx", test_input,
+        k=-1, dtype=TensorProto.FLOAT
+    )
+
+    # Test k=0
+    export_onnx_model(
+        "eye_like_0.onnx", test_input,
+        k=0, dtype=TensorProto.INT32
     )

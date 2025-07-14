@@ -1,5 +1,5 @@
 use super::{Node, NodeCodegen};
-use crate::burn::{BurnImports, Scope, TensorType, Type};
+use crate::burn::{BurnImports, Scope, TensorKind, TensorType, Type};
 use burn::record::PrecisionSettings;
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
@@ -29,18 +29,22 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for EyeLikeNode {
         let output = &self.output.name;
         let offset = self.offset;
 
-        let mask_dims = if self.input.rank == 1 {
-            quote! { [input_dims[0], input_dims[0]] }
-        } else {
-            quote! { [input_dims[0], input_dims[1]] }
+        let mut output_expr = quote! {
+            let dims: [usize; 2] = #input.shape().dims();
+            let mask = Tensor::<B, 2, Bool>::diag_mask(dims, #offset, &self.device).bool_not();
+            #input.zeros_like().mask_fill(mask, 1)
         };
 
+        if self.input.kind != self.output.kind {
+            output_expr = match self.output.kind {
+                TensorKind::Int => quote! { #output_expr.int() },
+                TensorKind::Float => quote! { #output_expr.float() },
+                TensorKind::Bool => quote! { #output_expr.bool() },
+            }
+        }
+
         quote! {
-            let #output = {
-                let input_dims: [usize; _] = #input.shape().dims();
-                let mask = Tensor::<B, 2, Bool>::diag_mask(#mask_dims, #offset, &self.device);
-                #input.zeros_like().mask_fill(mask, 0)
-            };
+            let #output = { #output_expr };
         }
     }
 

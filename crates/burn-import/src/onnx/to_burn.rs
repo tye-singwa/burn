@@ -1587,12 +1587,12 @@ impl ParsedOnnxGraph {
         ExpandNode::new(input, output, shape)
     }
 
-    fn eye_like_conversion(node: Node) -> EyeLikeNode{
+    fn eye_like_conversion(node: Node) -> EyeLikeNode {
         let input = TensorType::from(node.inputs.first().unwrap());
         let output = TensorType::from(node.outputs.first().unwrap());
-        // let shape = eye_like_config(&node);
+        let (offset, elem_type) = eye_like_config(&node);
 
-        EyeLikeNode::new(input, output, 0)
+        EyeLikeNode::new(input, output, offset)
     }
 
     fn neg_conversion(node: Node) -> UnaryNode {
