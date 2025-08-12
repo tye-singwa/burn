@@ -1,23 +1,38 @@
 use protobuf::Enum;
 
-use crate::{ArgType, ElementType, Node, protos::tensor_proto::DataType};
+use crate::{ArgType, ElementType, Node, TensorType, protos::tensor_proto::DataType};
 
 /// Update output rank for EyeLike operations based on input rank.
 pub fn eye_like_update_output(node: &mut Node) {
     log::debug!("EyeLike rank inference for node {}", node.name);
 
-    let mut elem_type: ElementType = node.inputs.first().unwrap().ty.elem_type().clone();
+    if node.inputs.len() != 1 {
+        panic!("EyeLike: multiple inputs are not supported");
+    }
 
-    let dtype = node
+    // extract the shape of the input tensor
+    let tensor = match node.inputs.first().unwrap().clone().ty {
+        ArgType::Tensor(tensor) => tensor,
+        _ => panic!("Only tensor input is valid"),
+    };
+
+    let elem_type: ElementType = node.inputs.first().unwrap().ty.elem_type().clone();
+
+    let output_elem_type = node
         .attrs
         .get("dtype")
-        .map(|val| DataType::from_i32(val.clone().into_i32()).unwrap())
-        .unwrap_or(node.inputs.first());
-    log::debug!("RandomLike dtype for {}: {:?}", node.name, dtype);
+        .map(|val| elem_type_from_dtype(DataType::from_i32(val.clone().into_i32()).unwrap()))
+        .unwrap_or(elem_type);
+
+    node.outputs[0].ty = ArgType::Tensor(TensorType {
+        elem_type: output_elem_type,
+        rank: tensor.rank,
+        static_shape: tensor.static_shape,
+    });
 }
 
 /// EyeLike (offset, elem_type) from the attributes of the node
-pub fn eye_like_config(node: &Node) -> (i64, ElementType) {
+pub fn eye_like_config(node: &Node) -> i64 {
     let mut offset: i64 = 0;
     let mut elem_type: ElementType = node.inputs.first().unwrap().ty.elem_type().clone();
 
@@ -26,7 +41,6 @@ pub fn eye_like_config(node: &Node) -> (i64, ElementType) {
             "k" => offset = value.clone().into_i64(),
             "dtype" => {
                 let dtype = DataType::from_i32(value.clone().into_i32()).unwrap();
-                elem_type = elem_type_from_dtype(dtype)
             }
             _ => panic!("Unexpected attribute for EyeLike: {key}"),
         }
@@ -37,6 +51,7 @@ pub fn eye_like_config(node: &Node) -> (i64, ElementType) {
 
 fn elem_type_from_dtype(dtype: DataType) -> ElementType {
     match dtype {
+        DataType::BOOL => ElementType::Bool,
         DataType::FLOAT16 => ElementType::Float16,
         DataType::FLOAT => ElementType::Float32,
         DataType::DOUBLE => ElementType::Float64,

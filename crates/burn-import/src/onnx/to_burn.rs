@@ -113,6 +113,7 @@ use onnx_ir::{
         depth_to_space::depth_to_space_config,
         dropout::dropout_config,
         expand::expand_config,
+        eye_like::eye_like_config,
         flatten::flatten_config,
         gather::{GatherInput, gather_config},
         gemm::gemm_config,
@@ -143,6 +144,7 @@ use onnx_ir::{
         unsqueeze::unsqueeze_config,
     },
     parse_onnx,
+
     util::shape_config,
 };
 
@@ -1590,7 +1592,7 @@ impl ParsedOnnxGraph {
     fn eye_like_conversion(node: Node) -> EyeLikeNode {
         let input = TensorType::from(node.inputs.first().unwrap());
         let output = TensorType::from(node.outputs.first().unwrap());
-        let (offset, elem_type) = eye_like_config(&node);
+        let offset = eye_like_config(&node);
 
         EyeLikeNode::new(input, output, offset)
     }

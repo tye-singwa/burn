@@ -9,12 +9,12 @@ from onnx import TensorProto
 from onnx.reference import ReferenceEvaluator
 
 
-def build_model(shape, **args):
+def build_model(shape, dtype, **args):
     # Define the graph inputs and outputs
     input = onnx.helper.make_tensor_value_info(
         'input', TensorProto.FLOAT, shape)
     output = onnx.helper.make_tensor_value_info(
-        'output', TensorProto.FLOAT, shape)
+        'output', dtype, shape)
 
     # Create the EyeLike node
     eye_like = onnx.helper.make_node(
@@ -22,6 +22,7 @@ def build_model(shape, **args):
         inputs=["input"],
         outputs=["output"],
         name="EyeLikeNode",
+        dtype=dtype,
         **args
     )
 
@@ -83,5 +84,11 @@ if __name__ == "__main__":
     # Test k=0
     export_onnx_model(
         "eye_like_0.onnx", test_input,
-        k=0, dtype=TensorProto.INT32
+        k=0, dtype=TensorProto.INT64
+    )
+
+    # Test bool
+    export_onnx_model(
+        "eye_like_bool.onnx", test_input,
+        k=0, dtype=TensorProto.BOOL
     )

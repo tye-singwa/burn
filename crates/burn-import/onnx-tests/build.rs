@@ -105,6 +105,7 @@ fn main() {
         .input("tests/eye_like/eye_like_up.onnx")
         .input("tests/eye_like/eye_like_down.onnx")
         .input("tests/eye_like/eye_like_0.onnx")
+        .input("tests/eye_like/eye_like_bool.onnx")
         .input("tests/flatten/flatten.onnx")
         .input("tests/flatten/flatten_2d.onnx")
         .input("tests/floor/floor.onnx")

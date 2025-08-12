@@ -1,6 +1,7 @@
 use super::{Node, NodeCodegen};
 use crate::burn::{BurnImports, Scope, TensorKind, TensorType, Type};
 use burn::record::PrecisionSettings;
+use onnx_ir::ElementType;
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 
@@ -21,7 +22,7 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for EyeLikeNode {
     }
 
     fn register_imports(&self, imports: &mut BurnImports) {
-        imports.register("burn::prelude::Bool");
+        imports.register("burn::tensor::Bool");
     }
 
     fn forward(&self, scope: &mut Scope, node_position: usize) -> TokenStream {
@@ -30,9 +31,9 @@ impl<PS: PrecisionSettings> NodeCodegen<PS> for EyeLikeNode {
         let offset = self.offset;
 
         let mut output_expr = quote! {
-            let dims: [usize; 2] = #input.shape().dims();
-            let mask = Tensor::<B, 2, Bool>::diag_mask(dims, #offset, &self.device).bool_not();
-            #input.zeros_like().mask_fill(mask, 1)
+            let input_dims: [usize; 2] = #input.shape().dims();
+            let input_mask = Tensor::<B, 2, Bool>::diag_mask(input_dims, #offset, &self.device).bool_not();
+            #input.zeros_like().mask_fill(input_mask, 1)
         };
 
         if self.input.kind != self.output.kind {
